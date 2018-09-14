@@ -67,7 +67,7 @@ a:hover {
 
 #welcome{
 	float:right;
-	margin: 50px 100px 0px 0px;
+	margin: 50px 100px 50px 0px;
 	max-width: 600px;
 	
 
@@ -102,13 +102,13 @@ a:hover {
 	border-radius: 50%;
 	float: left;
 	margin-top: 120px;
-	margin-left: 15%;
+	margin-left: 13%;
 }
 
 
 
 #main-footer{
-	position: absolute;
+	position: fixed;
 	bottom: 0;
 	width: 100%;
 	background: #333;
@@ -117,7 +117,7 @@ a:hover {
 	padding:0px;
 }
 
-/*@media(max-width:600px){
+@media(max-width:600px){
 	#main{
 		width:100%;
 		float:none;
@@ -126,4 +126,24 @@ a:hover {
 		width:100%;
 		float:none;
 	}
-}*/
+
+}
+@media(max-width:1250px){
+		#contact img{
+			
+    	align-items:center;
+    	display:block;
+    	left-margin:auto;
+    	right-margin:auto;
+
+	}
+	#contact table{
+		float:none;
+		margin-bottom: 100px
+		left-margin:50%;
+		display:block;
+    	left-margin:auto;
+    	right-margin:auto;
+
+	}
+}

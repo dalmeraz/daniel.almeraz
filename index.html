@@ -1,174 +1,49 @@
 <!DOCTYPE html>
-<html lang="en">
-
+<html>
 <head>
-  <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>babyplots example</title>
-  <script src="dist/CCapture.all.min.js"></script>
-  <script src="dist/examples/shapeCloud.js"></script>
-  <script src="dist/babyplots.js"></script>
-  
+	<title>Daniel Almeraz</title>
+	<link rel="stylesheet" type="text/css" href="css/styles.css">
+	<link rel="shortcut icon" type="image/png" href="images/favicon.png">
 </head>
-
-<style type="text/css">
-    /* CSS Document */
-    
-    body {
-        font-family: "Lato", sans-serif;
-        transition: background-color .5s;
-    }
-
-    .canvas {
-        position: fixed;
-        top: 75px;
-        left: 0;
-        height: 100%;
-        width: 100%;
-    }
-    
-    .sidenav {
-        height: 100%;
-        width: 0; 
-        position: fixed;
-        z-index: 1;
-        top: 0;
-        left: 0;
-        background-color: #111;
-        overflow-x: hidden;
-        transition: 0.5s; 
-        padding-top: 60px;
-    }
-    
-    .sidenav a {
-        padding: 8px 8px 8px 32px;
-        text-decoration: none;
-        font-size: 25px;
-        color: #818181;
-        display: block;
-        transition: 0.3s; 
-    }
-    
-    .sidenav a:hover, .offcanvas a:focus{
-        color: #f1f1f1;
-    }
-    
-    .sidenav .closebtn {
-        position: absolute;
-        top: 0;
-        right: 25px;
-        font-size: 36px;
-        margin-left: 50px;
-    }
-    
-    #main {
-        transition: margin-left .5s;
-        padding: 16px;
-    }
-    
-    /*当文档高度小于450px时，改变侧栏的padding属性和字体大小*/
-    @media screen and (max-height: 450px) {
-    .sidenav {padding-top: 15px;}
-    .sidenav a {font-size: 18px;}
-    }
-</style>
-
 <body>
+	<header id="main-header">
+		<div class="container">
+			<h1>Daniel Almeraz</h1>
+		</div>
+	</header>
+	<nav id="navbar">
+		
+			<ul>
+				<li><a style="color:#789" href="index.html">Home</a></li>
+				<li><a href="projects.html">Projects</a></li>
+				<li><a href="resume.html">Resume</a></li>
+				<li><a href="contact.html">Contact</a></li>
+				<li><a href="austin.html">Airbnb Project</a></li>
+			</ul>
+		
+	</nav>
+	<div id = welcome>
+		<div id = welcome-picture>
+			<img  src="images/googlepic.png" alt="Picture at Google" width=500>
+   		</div>
 
-    <form style="position: fixed; top:0px; right:10px;">
-      max price: <input type="text" id="max"><br>
-      min price: <input type="text" id="min"><br>
-    </form>
-    <button onclick="submit()" type="button" style="position: fixed; top:50px; right:30px;">submit</button>
-    <div id="mySidenav" class="sidenav">
-        <a href="javascript:void(0)" class="closebtn" onclick="closeNav()">&times;</a>
-        <a href="#">Austin</a>
-        <a href="#">Houston</a>
-        <a href="#">Dallas</a>
-        <a href="#">San Antonio</a>
-        <a href="./airbnb.html">Customize</a>
-    </div>
-        
-    <span style="font-size:30px; cursor:pointer; position: fixed; top:0px; left:10px;" onclick="openNav()">&#9776; City</span>
-    
-    <canvas id="renderNewCanvas" class="canvas" style="display: none;"></canvas>
-    <canvas id="renderCanvas" class="canvas"></canvas>
-  <script>
-
-    var vis = new Baby.Plots("renderCanvas", {});
-    var AustinCloudGraph = { "plots": [{ "plotType": "shapeCloud", "name": "Austin airbnb", "shape": "sphere", "legendShowShape": true, "shading": true, "coordinates": austin_data, "dpInfo": austin_dpInfo, "colorBy": "values", "colorVar": color_data, "size": 2, "colorScale": "Oranges", "customColorScale": null, "sortedCategories": null, "showLegend": true, "fontSize": 15, "fontColor": "#ddd", "legendTitle": "Average Price", "legendTitleFontSize": 15, "legendTitleFontColor": "#ddd", "showAxes": [true, true, true], "axisLabels": ["latitude", "longitude", "average_price"], "axisColors": ["white", "#666666", "#666666"], "tickBreaks": [2, 2, 2], "showTickLines": [[false, false], [false, false], [false, false]], "tickLineColors": [["#666666", "#666666"], ["#666666", "#666666"], ["#666666", "#666666"]], "folded": false, "foldedEmbedding": null, "foldAnimDelay": 100, "foldAnimDuration": 200 }], "turntable": false, "rotationRate": 0.01, "backgroundColor": "#333333ff", "xScale": 5, "yScale": 5, "zScale": 5, "cameraAlpha": 0, "cameraBeta": 1, "cameraRadius": 14.503403924684442, "labels": []}
-    vis.fromJSON(AustinCloudGraph);
-
-    vis.doRender();
-
-    // vis.createButtons(["turntable", "json"]);
-    window.onresize = function () {
-      vis.resize();
-      
-    }
-    
-    function openNav() {
-        document.getElementById("mySidenav").style.width = "250px";
-    }
-    function closeNav() {
-        document.getElementById("mySidenav").style.width = "0";
-    }
-
-    function test() {
-        var max = document.getElementById("max").value;
-        var min = document.getElementById("min").value;
-        console.log(max);
-        //document.getElementById("renderCanvas").style.display = "none";
-    }
-    
-    function submit() {
-        var max = document.getElementById("max").value;
-        var min = document.getElementById("min").value;
-
-        isChanged = true;
-
-        filtered_austin_data = []
-        filtered_color_data = []
-
-        for (var i = 0; i < austin_data.length; ++i){
-            latitude = austin_data[i][0];
-            average_rate_per_night = austin_data[i][1];
-            longitude = austin_data[i][2];
-
-            if (average_rate_per_night >= min && average_rate_per_night <= max) {
-                var place = [];
-                place.push(latitude);
-                place.push(average_rate_per_night);
-                place.push(longitude);
-                filtered_austin_data.push(place);
-                filtered_color_data.push(10000 * parseFloat(average_rate_per_night)*parseFloat(average_rate_per_night));
-            }
-        }
-
-        
-        console.log(filtered_austin_data);
-
-        document.getElementById("renderNewCanvas").style.display = "";
-        document.getElementById("renderCanvas").style.display = "none";
-        var newvis = new Baby.Plots("renderNewCanvas", {});
-        var newAustinCloudGraph = { "plots": [{ "plotType": "shapeCloud", "name": "Austin airbnb", "shape": "sphere", "legendShowShape": true, "shading": true, "coordinates": filtered_austin_data, "colorBy": "values", "colorVar": filtered_color_data, "size": 2, "colorScale": "Oranges", "customColorScale": null, "sortedCategories": null, "showLegend": true, "fontSize": 15, "fontColor": "#ddd", "legendTitle": "Points - Decastars", "legendTitleFontSize": 15, "legendTitleFontColor": "#ddd", "showAxes": [true, true, true], "axisLabels": ["latitude", "longitude", "average_price"], "axisColors": ["#666666", "#666666", "#666666"], "tickBreaks": [2, 2, 2], "showTickLines": [[false, false], [false, false], [false, false]], "tickLineColors": [["#666666", "#666666"], ["#666666", "#666666"], ["#666666", "#666666"]], "folded": false, "foldedEmbedding": null, "foldAnimDelay": 100, "foldAnimDuration": 200 }], "turntable": false, "rotationRate": 0.01, "backgroundColor": "#333333ff", "xScale": 5, "yScale": 5, "zScale": 5, "cameraAlpha": 0, "cameraBeta": 1, "cameraRadius": 14.503403924684442, "labels": [], "shapeLegendTitle": "Competition" }
-        newvis.fromJSON(newAustinCloudGraph);
-
-        newvis.doRender();
-        newvis.resize();
-        window.onresize = function () {
-            newvis.resize();
-        }
-
-    }
-    
-
-    
-    
-    
-    
-    
-  </script>
+		<div id = "welcome-text">
+			<h1>Welcome!</h1>
+			<p>
+			Hello! My name is Daniel Almeraz and I am currently a Computer Science student at UTEP expecting to graduate in December of 2019 with a minor in Math.  
+			</p>
+			<p>I have experience contributing to two large scale front end and back end teams during two seperate Google internships and also game development under a school organization called Game Builders! 
+			</p>
+			<p>My research interest are currently in exploring the realm of Machine Learning and Computer Vision and I currently involved into two research labs, one of which I am a lead in.
+			</p>
+			<p>I am also interested in furthur continuing to develop my software skills in not only development but also design!
+			</p>
+			<p>Please feel free to reach out to me with any questions or comments through my information in the contact section.
+			</p>
+		</div>
+	<div>
+    <footer id="main-footer">
+    	<p>Copyright &copy; 2018 Daniel Almeraz</p>
+    </footer>
 </body>
-
 </html>

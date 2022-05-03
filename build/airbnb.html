@@ -1,0 +1,107 @@
+<!DOCTYPE html>
+<html>
+    <head>
+        <title>Austin Airbnb Data</title>
+        <script src="dist/CCapture.all.min.js"></script>
+        <script src="dist/babyplots.js"></script>
+    </head>
+
+
+    <body>
+
+        <form id="myForm">
+        <input type="file" id="csvFile" accept=".csv" />
+        <br />
+        <input type="submit" value="Submit" />
+        </form>
+
+        
+
+        <canvas id="babyplot" width="1000" height="600" >
+
+        <script type="text/javascript">
+
+            const myForm = document.getElementById("myForm");
+            const csvFile = document.getElementById("csvFile");
+
+            function csvToArray(str, delimiter = ",") {
+              // slice from start of text to the first \n index
+              // use split to create an array from string by delimiter
+              const headers = str.slice(0, str.indexOf("\n")).split(delimiter);
+              for (var i = 0; i < headers.length; ++ i){
+                headers[i] = headers[i].replace(/(\r\n|\n|\r)/gm, "");
+              }
+              // slice from \n index + 1 to the end of the text
+              // use split to create an array of each csv value row
+              const rows = str.slice(str.indexOf("\n") + 1).split("\n");
+
+              // Map the rows
+              // split values from each row into an array
+              // use headers.reduce to create an object
+              // object properties derived from headers:values
+              // the object passed as an element of the array
+              const arr = rows.map(function (row) {
+                const values = row.split(delimiter);
+                const el = headers.reduce(function (object, header, index) {
+                  if (values[index]) 
+                    object[header] = values[index].replace(/(\r\n|\n|\r)/gm, "");
+                  return object;
+                }, {});
+                return el;
+              });
+
+              // return the array
+              return arr;
+            }
+
+            myForm.addEventListener("submit", function(event) {
+                console.log("New event");
+                event.preventDefault();
+
+                try{
+                    console.log("Reading input");
+
+                    const input = csvFile.files[0];
+                    console.log(input);
+                    const reader = new FileReader();
+                    reader.onload = function (event) {
+                        const text = event.target.result;
+                        const data = csvToArray(text);
+                        
+                        var austin_data = Array.from(Array(data.length), () => new Array(3))
+                      
+                        var color_data = new Array(data.length)
+
+                        for (var i = 0; i < data.length; ++i){
+                    
+                            austin_data[i][0] = parseFloat(data[i]["\"latitude\""]);
+                            austin_data[i][1] = parseFloat(data[i]["\"average_rate_per_night\""]);
+                            austin_data[i][2] = parseFloat(data[i]["\"longitude\""]);
+                            //color_data[i] = parseInt(1000 * parseFloat(austin_data[i][1])) + 8000;
+                            color_data[i] = 8000 + i;
+                        }
+                        console.log(color_data);
+
+                        var vis = new Baby.Plots("babyplot", {backgroundColor: "#444444ff"});
+
+                        var shapeCloudData = { "plots": [{ "plotType": "shapeCloud", "name": "Austin", "shape": "sphere", "legendShowShape": true, "shading": true, "coordinates": austin_data, "colorBy": "values", "colorVar": color_data, "size": 2, "colorScale": "Oranges", "customColorScale": null, "sortedCategories": null, "showLegend": true, "fontSize": 15, "fontColor": "#ddd", "legendTitle": "Points - Decastars", "legendTitleFontSize": 15, "legendTitleFontColor": "#ddd", "showAxes": [true, true, true], "axisLabels": ["latitude", "longitude", "average_price"], "axisColors": ["#666666", "#666666", "#666666"], "tickBreaks": [2, 2, 2], "showTickLines": [[false, false], [false, false], [false, false]], "tickLineColors": [["#666666", "#666666"], ["#666666", "#666666"], ["#666666", "#666666"]], "folded": false, "foldedEmbedding": null, "foldAnimDelay": 100, "foldAnimDuration": 200 }], "turntable": false, "rotationRate": 0.01, "backgroundColor": "#333333ff", "xScale": 5, "yScale": 5, "zScale": 5, "cameraAlpha": 0, "cameraBeta": 1, "cameraRadius": 14.503403924684442, "labels": [], "shapeLegendTitle": "Competition" }
+
+                        vis.fromJSON(shapeCloudData);
+                        vis.doRender();
+                    };
+                    reader.readAsText(input);
+
+
+                }catch(event) {
+                    alert("sorry, something went wrong!");
+                }
+
+            });
+
+        </script>
+         </canvas>
+
+       
+
+    </body>
+</html>

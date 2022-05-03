@@ -1,0 +1,229 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Airbnb - Austin</title>
+  <script src="dist/CCapture.all.min.js"></script>
+  <script src="./austin.js"></script>
+  <script src="dist/babyplots.js"></script>
+  <script src="./compass.js"></script>
+  
+</head>
+
+<style type="text/css">
+    /* CSS Document */
+    
+    body {
+        font-family: "Lato", sans-serif;
+        transition: background-color .5s;
+    }
+
+    .canvas {
+        position: fixed;
+        top: 75px;
+        left: 0;
+        height: 100%;
+        width: 100%;
+    }
+    
+    .sidenav {
+        height: 100%;
+        width: 0; 
+        position: fixed;
+        z-index: 1;
+        top: 0;
+        left: 0;
+        background-color: #111;
+        overflow-x: hidden;
+        transition: 0.5s; 
+        padding-top: 60px;
+    }
+    
+    .sidenav a {
+        padding: 8px 8px 8px 32px;
+        text-decoration: none;
+        font-size: 25px;
+        color: #818181;
+        display: block;
+        transition: 0.3s; 
+    }
+    
+    .sidenav a:hover, .offcanvas a:focus{
+        color: #f1f1f1;
+    }
+    
+    .sidenav .closebtn {
+        position: absolute;
+        top: 0;
+        right: 25px;
+        font-size: 36px;
+        margin-left: 50px;
+    }
+    
+    #main {
+        transition: margin-left .5s;
+        padding: 16px;
+    }
+    
+    @media screen and (max-height: 450px) {
+    .sidenav {padding-top: 15px;}
+    .sidenav a {font-size: 18px;}
+    }
+</style>
+
+<body>
+    <form style="position: fixed; top:0px; right:300px;">
+        <select id="bedroom_type">
+            <option value="All">All</option>
+            <option value="Studio">Studio</option>
+            <option value="1">1</option>
+            <option value="2">2</option>
+            <option value="3">3</option>
+            <option value="3+">3+</option>
+        </select>
+    </form>
+
+    <form style="position: fixed; top:0px; right:10px;">
+      max price: <input type="text" id="max" value="10000"><br>
+      min price: <input type="text" id="min" value="0"><br>
+    </form>
+    <button onclick="submit()" type="button" style="position: fixed; top:50px; right:30px;">submit</button>
+    <div id="mySidenav" class="sidenav">
+        <a href="javascript:void(0)" class="closebtn" onclick="closeNav()">&times;</a>
+        <a href="./austin.html">Austin</a>
+        <a href="./dallas.html">Dallas</a>
+        <a href="./fortworth.html">Fortworth</a>
+        <a href="./houston.html">Houston</a>
+        <a href="./sanantonio.html">San Antonio</a>
+        <a href="./airbnb.html">Customize</a>
+    </div>
+        
+    <span style="font-size:30px; cursor:pointer; position: fixed; top:0px; left:10px;" onclick="openNav()">&#9776; Austin</span>
+    <br>
+    <p> Mean Airbnb Price: $96 </p>
+    <canvas id="renderNewCanvas" class="canvas" style="display: none;"></canvas>
+    <canvas id="renderCanvas" class="canvas"></canvas>
+  <script>
+    
+    var vis = new Baby.Plots("renderCanvas", {});
+    
+    var austinCloudGraph = { "plots": [{ "plotType": "shapeCloud", "name": "austin airbnb", "shape": "sphere", "legendShowShape": false, "shading": true, "coordinates": austin_graph_data, "dpInfo": austin_dpInfo, "colorBy": "values", "colorVar": austin_color_data, "size": 2, "colorScale": "Oranges", "customColorScale": null, "sortedCategories": null, "showLegend": true, "fontSize": 15, "fontColor": "#ddd", "legendTitle": "Average Price", "legendTitleFontSize": 15, "legendTitleFontColor": "#ddd", "showAxes": [true, true, true], "axisLabels": ["N->", "longitude", "E->"], "axisColors": ["#aaaaaa", "#aaaaaa", "#aaaaaa"], "tickBreaks": [2, 2, 2], "showTickLines": [[false, true], [false, false], [true, false]], "tickLineColors": [["#666666", "#666666"], ["#666666", "#666666"], ["#666666", "#666666"]], "folded": false, "foldedEmbedding": null, "foldAnimDelay": 100, "foldAnimDuration": 200 }], "turntable": false, "rotationRate": 0.01, "backgroundColor": "#333333ff", "xScale": 5, "yScale": 5, "zScale": 5, "cameraAlpha": 0, "cameraBeta": 1, "cameraTarget":[50,10,10], "cameraRadius": 40, "labels": []}
+    vis.addMeshObject(gltfString, {"meshScaling":[7,7,7], "meshRotation":[0,3.15,1.503403924684442],"meshOffset":[25,-15,25]});
+    vis.fromJSON(austinCloudGraph);
+
+    vis.doRender();
+
+    // vis.createButtons(["turntable", "json"]);
+    window.onresize = function () {
+      vis.resize();
+    }
+    
+    function openNav() {
+        document.getElementById("mySidenav").style.width = "250px";
+    }
+    function closeNav() {
+        document.getElementById("mySidenav").style.width = "0";
+    }
+    
+    function submit() {
+        var max = document.getElementById("max").value;
+        var min = document.getElementById("min").value;
+
+        filtered_graph_data = []
+        filtered_color_data = []
+        filtered_info_data = []
+
+        for (var i = 0; i < austin_data.length; ++i){
+            latitude = austin_data[i][0];
+            longitude = austin_data[i][1];
+            average_rate_per_night = austin_data[i][2];
+            bedroom_number = austin_data[i][3];
+            title = austin_data[i][4];
+            true_rate = austin_data[i][5];
+
+            isBedroomChosen = false;
+            requiredBedroom = document.getElementById("bedroom_type").value;
+            
+            switch (requiredBedroom) {
+                case "All":
+                    isBedroomChosen = true;
+                    break;
+                case "Studio":
+                    if (bedroom_number === "Studio") {
+                        isBedroomChosen = true;
+                    }
+                    break;
+                case "1":
+                    if (bedroom_number === "1") {
+                        isBedroomChosen = true;
+                    }
+                    break;
+                case "2":
+                    if (bedroom_number === "2") {
+                        isBedroomChosen = true;
+                    }
+                    break;
+                case "3":
+                    if (bedroom_number === "3") {
+                        isBedroomChosen = true;
+                    }
+                    break;
+                case "3+":
+                    if (!isNaN(bedroom_number)) {
+                        if (parseInt(bedroom_number) > 3) {
+                            isBedroomChosen = true;
+                        } 
+                    }
+                    break;
+            }
+
+            if (true_rate >= min && true_rate <= max) {
+                
+                if (isBedroomChosen) {
+                    var node = new Array();
+                    node[0] = latitude;
+                    node[1] = true_rate/50;
+                    node[2] = longitude;
+
+                    filtered_graph_data.push(node)
+                    filtered_color_data.push(true_rate);
+                    var info = 'Title:' + title + '\n' + 'Price:' + true_rate + '\n' + 'Bedroom:' + bedroom_number;
+                    filtered_info_data.push(info); 
+                }
+            }               
+        }
+
+        console.log(filtered_graph_data)
+        if (filtered_graph_data.length == 0) {
+            alert("No bedroom!");
+        }
+        else {
+            document.getElementById("renderNewCanvas").style.display = "";
+            document.getElementById("renderCanvas").style.display = "none";
+            var newvis = new Baby.Plots("renderNewCanvas", {});
+            var newCloudGraph = { "plots": [{ "plotType": "shapeCloud", "name": "Austin airbnb", "shape": "sphere", "legendShowShape": false, "shading": true, "coordinates": filtered_graph_data, "dpInfo": filtered_info_data, "colorBy": "values", "colorVar": filtered_color_data, "size": 2, "colorScale": "Oranges", "customColorScale": null, "sortedCategories": null, "showLegend": true, "fontSize": 15, "fontColor": "#ddd", "legendTitle": "Price per night", "legendTitleFontSize": 15, "legendTitleFontColor": "#ddd", "showAxes": [true, true, true], "axisLabels": ["latitude", "longitude", "average_price"], "axisColors": ["#666666", "#666666", "#666666"], "tickBreaks": [2, 2, 2], "showTickLines": [[false, true], [false, false], [true, false]], "tickLineColors": [["#666666", "#666666"], ["#666666", "#666666"], ["#666666", "#666666"]], "folded": false, "foldedEmbedding": null, "foldAnimDelay": 100, "foldAnimDuration": 200 }], "turntable": false, "rotationRate": 0.01, "backgroundColor": "#333333ff", "xScale": 5, "yScale": 5, "zScale": 5, "cameraAlpha": 0, "cameraBeta": 1, "cameraRadius": 14.503403924684442, "labels": []}
+            newvis.addMeshObject(gltfString, {"meshScaling":[7,7,7], "meshRotation":[0,3.15,1.503403924684442],"meshOffset":[25,-15,25]});
+            newvis.fromJSON(newCloudGraph);
+
+            newvis.doRender();
+            window.onresize = function () {
+                newvis.resize();
+            }
+        }
+
+        
+
+    }
+    
+
+    
+    
+    
+    
+    
+  </script>
+</body>
+
+</html>
